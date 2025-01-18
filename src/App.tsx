@@ -1,25 +1,52 @@
+import { Route, Switch, Link } from "wouter";
 import { useEffect, useState } from "react";
-import { supabase } from "./supabaseClient";
+import { Weight } from "./types/weight";
+import { getWeights } from "./services/weights";
 
-function App() {
-  const [countries, setCountries] = useState([]);
+function Layout() {
+  return (
+    <div>
+      <nav>
+        <Link href="/">Home</Link> | 
+        <Link href="/weights">Weights</Link>
+      </nav>
+      <main>
+        <Switch>
+          <Route path="/" component={Home} />
+          <Route path="/weights" component={WeightList} />
+        </Switch>
+      </main>
+    </div>
+  );
+}
+
+function Home() {
+  return <h1>Welcome to Weight Tracker</h1>;
+}
+
+function WeightList() {
+  const [weights, setWeights] = useState<Weight[]>([]);
 
   useEffect(() => {
-    getCountries();
+    fetchWeights();
   }, []);
 
-  async function getCountries() {
-    const { data } = await supabase.from("countries").select();
-    setCountries(data);
+  async function fetchWeights() {
+    const data = await getWeights();
+    setWeights(data);
   }
 
   return (
     <ul>
-      {countries.map((country) => (
-        <li key={country.name}>{country.name}</li>
+      {weights.map((weight) => (
+        <li key={weight.created_at}>{weight.weight}</li>
       ))}
     </ul>
   );
+}
+
+function App() {
+  return <Layout />;
 }
 
 export default App;

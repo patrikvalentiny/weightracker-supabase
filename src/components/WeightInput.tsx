@@ -39,10 +39,15 @@ export function WeightInput({ onSubmit, lastWeight }: WeightInputProps) {
     return <span className={color}>{`${sign}${diff.toFixed(1)}kg`}</span>;
   };
 
+  const handleOpen = () => {
+    setWeightValue(lastWeight ? lastWeight.toString() : '');
+    dialogRef.current?.showModal();
+  };
+
   return (
     <>
       <button 
-        onClick={() => dialogRef.current?.showModal()}
+        onClick={handleOpen}
         className="btn btn-primary fixed bottom-4 sm:right-4 left-1/2 sm:left-auto -translate-x-1/2 sm:translate-x-0 flex items-center justify-center"
       >
         + Add Weight

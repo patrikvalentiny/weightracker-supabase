@@ -4,15 +4,16 @@ import { Weight } from "../types/weight";
 export async function getWeights(): Promise<Weight[]> {
   const { data } = await supabase
     .from("weights")
-    .select() as { data: Weight[] | null };
+    .select()
+    .order('created_on', { ascending: false }) as { data: Weight[] | null };
   
   return data || [];
 }
 
-export async function addWeight(weight: number): Promise<Weight | null> {
+export async function addWeight(weight: Weight): Promise<Weight | null> {
   const { data } = await supabase
     .from("weights")
-    .insert([{ weight }])
+    .insert(weight)
     .select()
     .single() as { data: Weight | null };
   

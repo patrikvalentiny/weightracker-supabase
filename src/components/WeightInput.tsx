@@ -1,13 +1,15 @@
 import { useRef, FormEvent, useState } from 'react';
+import { Weight } from '../types/weight';
 
 interface WeightInputProps {
-  onSubmit: (weight: number) => void;
+  onSubmit: (weight: Weight) => void;
   lastWeight?: number;
 }
 
 export function WeightInput({ onSubmit, lastWeight }: WeightInputProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [weightValue, setWeightValue] = useState<string>('');
+  const [dateValue, setDateValue] = useState<string>(new Date().toISOString().split('T')[0]);
 
   const isValidWeight = !isNaN(parseFloat(weightValue));
 
@@ -15,9 +17,10 @@ export function WeightInput({ onSubmit, lastWeight }: WeightInputProps) {
     e.preventDefault();
     const weight = parseFloat(weightValue);
     if (!isNaN(weight)) {
-      onSubmit(weight);
+      onSubmit({ weight, created_on: dateValue } as Weight);
       dialogRef.current?.close();
       setWeightValue('');
+      setDateValue(new Date().toISOString().split('T')[0]);
     }
   };
 
@@ -51,10 +54,22 @@ export function WeightInput({ onSubmit, lastWeight }: WeightInputProps) {
           <form onSubmit={handleSubmit} className="form-control">
             <div>
               <label className="label">
+                <span className="label-text">Date</span>
+              </label>
+              <input
+                type="date"
+                value={dateValue}
+                onChange={(e) => setDateValue(e.target.value)}
+                className="input input-bordered w-full"
+                required
+              />
+            </div>
+            <div>
+              <label className="label">
                 <span className="label-text">Weight (kg)</span>
               </label>
               <div className="flex justify-center">
-                <div className="flex items-center gap-2 w-48">
+                <div className="flex items-center gap-2 w-full">
                   <button 
                     type="button" 
                     className="btn btn-square"
@@ -71,7 +86,7 @@ export function WeightInput({ onSubmit, lastWeight }: WeightInputProps) {
                     required
                     value={weightValue}
                     onChange={(e) => setWeightValue(e.target.value)}
-                    className="input input-bordered w-24 text-center"
+                    className="input input-bordered text-center w-full"
                   />
                   <button 
                     type="button" 

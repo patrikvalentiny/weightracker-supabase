@@ -11,19 +11,19 @@ export type Database = {
     Tables: {
       weights: {
         Row: {
-          created_at: string
+          created_on: string
           id: number
           user_id: string | null
           weight: number
         }
         Insert: {
-          created_at?: string
+          created_on: string
           id?: number
           user_id?: string | null
           weight: number
         }
         Update: {
-          created_at?: string
+          created_on?: string
           id?: number
           user_id?: string | null
           weight?: number

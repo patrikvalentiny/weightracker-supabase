@@ -115,7 +115,7 @@ export default function Home() {
 
                 <StatsCard
                     title="BMI"
-                    value={currentBMI.toString()}
+                    value={currentBMI}
                     subtitle={bmiCategory}
                 >
                     {BMIInfo}

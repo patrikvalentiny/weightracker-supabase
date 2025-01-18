@@ -54,29 +54,31 @@ export function WeightTable({ weights, onWeightSelect }: WeightTableProps) {
       {/* Weights grid */}
       <div className="grid grid-cols-7 gap-1 mt-2">
         {weights.length > 0 ? (
-          weights.map((weight) => (
-            <div
-              key={weight.date.toISOString()}
-              onClick={() => handleWeightClick(weight.date)}
-              className={`
-                card stat compact cursor-pointer hover:bg-base-200
-                ${weight.date === selectedDate ? 'bg-base-300' : 'bg-base-100'}
-                ${getColStart(weight.date)}
-              `}
-            >
-              <div className="card-body p-2 items-center text-center">
-                <div className="text-xs opacity-50">
-                  {weight.date.toLocaleDateString()}
-                </div>
-                <div className="stat-value text-lg">
-                  {weight.weight.toFixed(1)}
-                </div>
-                <div className={`text-xs ${(weight.difference ?? 0) > 0 ? 'text-error' : 'text-success'}`}>
-                  {(weight.difference ?? 0).toFixed(1)}kg
-                </div>
+          [...weights]
+            .sort((a, b) => a.date.getTime() - b.date.getTime())
+            .map((weight) => (
+              <div
+            key={weight.date.toISOString()}
+            onClick={() => handleWeightClick(weight.date)}
+            className={`
+              card stat compact cursor-pointer hover:bg-base-200
+              ${weight.date === selectedDate ? 'bg-base-300' : 'bg-base-100'}
+              ${getColStart(weight.date)}
+            `}
+              >
+            <div className="card-body p-2 items-center text-center">
+              <div className="text-xs opacity-50">
+                {weight.date.toLocaleDateString()}
+              </div>
+              <div className="stat-value text-lg">
+                {weight.weight.toFixed(1)}
+              </div>
+              <div className={`text-xs ${(weight.difference ?? 0) > 0 ? 'text-error' : 'text-success'}`}>
+                {(weight.difference ?? 0).toFixed(1)}kg
               </div>
             </div>
-          ))
+              </div>
+            ))
         ) : (
           <div className="col-span-7 text-center opacity-50">
             No weights recorded

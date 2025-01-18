@@ -2,12 +2,12 @@ import { Switch, Route, Link } from "wouter";
 import { useState, useCallback, useEffect } from "react";
 import { WeightsContext } from "../contexts/WeightsContext";
 import { getWeights } from "../services/weights";
-import { Weight } from "../types/weight";
 import Home from "../pages/Home";
 import WeightList from "../pages/WeightList";
+import { WeightWithBMIModel } from "../types/WeightWithBMI";
 
 export function MainLayout() {
-  const [weights, setWeights] = useState<Weight[]>([]);
+  const [weights, setWeights] = useState<WeightWithBMIModel[]>([]);
 
   const refreshWeights = useCallback(async () => {
     const data = await getWeights();

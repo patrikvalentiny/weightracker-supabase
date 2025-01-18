@@ -1,8 +1,8 @@
 import { createContext, useContext } from 'react';
-import { Weight } from '../types/weight';
+import { WeightWithBMIModel } from '../types/WeightWithBMI';
 
 interface WeightsContextType {
-    weights: Weight[];
+    weights: WeightWithBMIModel[];
     refreshWeights: () => Promise<void>;
 }
 

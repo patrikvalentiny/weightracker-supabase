@@ -1,9 +1,10 @@
+import { WeightWithBMIModel } from "../types/WeightWithBMI";
 import { supabase } from "../supabaseClient";
 import { Weight } from "../types/weight";
 
-export async function getWeights(): Promise<Weight[]> {
+export async function getWeights(): Promise<WeightWithBMIModel[]> {
   const { data } = await supabase
-    .from("weights")
+    .from("weights_with_bmi")
     .select()
     .order('created_on', { ascending: false }) as { data: Weight[] | null };
   

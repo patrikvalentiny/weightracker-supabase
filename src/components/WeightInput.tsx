@@ -64,6 +64,7 @@ export function WeightInput({ onSubmit, lastWeight }: WeightInputProps) {
               <input
                 type="date"
                 value={dateValue}
+                max={new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split('T')[0]}
                 onChange={(e) => setDateValue(e.target.value)}
                 className="input input-bordered w-full"
                 required

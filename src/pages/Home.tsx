@@ -11,31 +11,9 @@ export default function Home() {
     const { weights, refreshWeights } = useWeights();
     const latestWeight = weights[0];
 
-    // Add height constant (in meters) - TODO: make configurable
-    const height = 1.89;
-
-    // Add BMI calculation
-    const calculateBMI = (weight: number, height: number) => {
-        const bmi = weight / (height * height);
-        return Number(bmi.toFixed(1));
-    };
-
-    const getBMICategory = (bmi: number) => {
-        if (bmi < 16.0) return "Severe Underweight";
-        if (bmi < 17.0) return "Moderate Underweight";
-        if (bmi < 18.5) return "Mild Underweight";
-        if (bmi < 25.0) return "Normal Weight";
-        if (bmi < 30.0) return "Overweight";
-        if (bmi < 35.0) return "Class I Obesity";
-        if (bmi < 40.0) return "Class II Obesity";
-        return "Class III Obesity";
-    };
-
-    const currentBMI = latestWeight
-        ? calculateBMI(latestWeight.weight, height)
-        : 0;
-
-    const bmiCategory = getBMICategory(currentBMI);
+    // Add null checks for BMI calculations
+    const currentBMI = latestWeight?.bmi ?? 0;
+    const bmiCategory = latestWeight?.bmi_category ?? 'Unknown';
 
     const lastWeekWeight = weights.find(w => {
         const date = new Date(w.created_on);

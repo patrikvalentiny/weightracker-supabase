@@ -9,6 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      bmi_categories: {
+        Row: {
+          description: string | null
+          id: number
+          max_value: number | null
+          min_value: number
+          name: string
+          recommendations: string | null
+        }
+        Insert: {
+          description?: string | null
+          id?: number
+          max_value?: number | null
+          min_value: number
+          name: string
+          recommendations?: string | null
+        }
+        Update: {
+          description?: string | null
+          id?: number
+          max_value?: number | null
+          min_value?: number
+          name?: string
+          recommendations?: string | null
+        }
+        Relationships: []
+      }
       weights: {
         Row: {
           created_on: string
@@ -32,7 +59,19 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      weights_with_bmi: {
+        Row: {
+          bmi: number | null
+          bmi_category: string | null
+          created_on: string | null
+          description: string | null
+          id: number | null
+          recommendations: string | null
+          user_id: string | null
+          weight: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never

@@ -16,6 +16,7 @@ export const WeeklyProgressCard = ({ progress, hasLastWeekValue }: WeeklyProgres
                         <progress 
                             className={`progress ${progress <= 0 ? 'progress-success' : 'progress-error'}`} 
                             value={Math.abs(progress)} 
+                            max={2}
                         ></progress>
                     </>
                 ) : (

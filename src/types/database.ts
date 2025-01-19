@@ -36,6 +36,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_details: {
+        Row: {
+          first_name: string | null
+          height_cm: number
+          last_name: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          first_name?: string | null
+          height_cm: number
+          last_name?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          first_name?: string | null
+          height_cm?: number
+          last_name?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       weights: {
         Row: {
           created_on: string
@@ -66,6 +90,7 @@ export type Database = {
           created_on: string | null
           description: string | null
           id: number | null
+          one_week_average: number | null
           recommendations: string | null
           user_id: string | null
           weight: number | null

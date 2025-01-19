@@ -7,6 +7,7 @@ import WeightList from "../pages/WeightList";
 import Signup from "../pages/Signup";
 import { WeightWithBMIModel } from "../types/WeightWithBMI";
 import Login from "../pages/Login";
+import UserDetails from "../pages/UserDetails";
 
 export function MainLayout() {
   const [weights, setWeights] = useState<WeightWithBMIModel[]>([]);
@@ -26,6 +27,8 @@ export function MainLayout() {
         <nav>
           <Link href="/">Home</Link> | 
           <Link href="/weights">Weights</Link> |
+          <Link href="/profile">Profile</Link> |
+          <Link href="/login">Login</Link> |
           <Link href="/signup">Sign Up</Link>
         </nav>
         <main>
@@ -40,6 +43,7 @@ export function MainLayout() {
               }}
             </Route>
             <Route path="/login" component={Login} />
+            <Route path="/profile" component={UserDetails} />
           </Switch>
         </main>
       </div>

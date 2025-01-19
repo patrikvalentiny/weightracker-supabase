@@ -7,4 +7,5 @@ export interface WeightWithBMIModel  {
   bmi_category?: string;
   recommendations?: string;
   description?: string;
+  difference?: number;
 }

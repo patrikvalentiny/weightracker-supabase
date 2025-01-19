@@ -108,6 +108,7 @@ export default function Home() {
                 <CurrentWeightCard
                     weight={latestWeight?.weight ?? 0}
                     date={latestWeight ? formatDate(latestWeight.created_on) : 'No data'}
+                    difference={latestWeight?.difference}
                 />
                 <WeeklyProgressCard
                     progress={weeklyProgress}

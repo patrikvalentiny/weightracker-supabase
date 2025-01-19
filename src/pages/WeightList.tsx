@@ -6,8 +6,7 @@ export default function WeightList() {
   
   const transformedWeights = weights.map(w => ({
     ...w,
-    date: new Date(w.created_on),
-    difference: 0 // TODO: Calculate actual difference
+    date: new Date(w.created_on)
   }));
 
   return <WeightTable weights={transformedWeights} />;

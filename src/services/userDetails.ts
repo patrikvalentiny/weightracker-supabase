@@ -21,7 +21,14 @@ export async function updateUserDetails(details: Partial<UserDetails>): Promise<
   const { data, error } = await supabase
     .from('user_details')
     .upsert(
-        {user_id: user.id, height_cm: details.height_cm!, first_name: details.first_name, last_name: details.last_name, updated_at: new Date().toISOString()},
+        {
+          user_id: user.id,
+          height_cm: details.height_cm!,
+          first_name: details.first_name,
+          last_name: details.last_name,
+          target_weight: details.target_weight,
+          updated_at: new Date().toISOString()
+        },
     )
     .select()
     .single();

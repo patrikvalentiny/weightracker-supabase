@@ -4,4 +4,5 @@ export interface UserDetails {
   last_name?: string | null;
   height_cm: number;
   updated_at?: string | null;
+  target_weight?: number | null;
 }

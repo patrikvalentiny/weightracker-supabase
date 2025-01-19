@@ -5,7 +5,8 @@ import { UserDetails as IUserDetails } from '../types/userDetails';
 export default function UserDetails() {
   const [details, setDetails] = useState<IUserDetails>({
     user_id: '',
-    height_cm: 0
+    height_cm: 0,
+    target_weight: null
   });
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -81,6 +82,17 @@ export default function UserDetails() {
                           className="input input-bordered"
                           value={details.height_cm}
                           onChange={(e) => setDetails({ ...details, height_cm: parseInt(e.target.value) || 0 })} />
+                  </div>
+                  <div className="form-control">
+                      <label className="label">
+                          <span className="label-text">Target Weight (kg)</span>
+                      </label>
+                      <input
+                          type="number"
+                          step="0.1"
+                          className="input input-bordered"
+                          value={details.target_weight ?? ''}
+                          onChange={(e) => setDetails({ ...details, target_weight: parseFloat(e.target.value) || null })} />
                   </div>
                   {error && <div className="text-error text-sm mt-1">{error}</div>}
                   {message && <div className="text-success text-sm mt-1">{message}</div>}

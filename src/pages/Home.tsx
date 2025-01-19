@@ -46,6 +46,8 @@ export default function Home() {
         }
     };
 
+    const goalProgress = 60;
+
     const BMIInfo = (
         <div className="dropdown dropdown-hover dropdown-top">
             <label tabIndex={0} className="cursor-help">
@@ -123,8 +125,8 @@ export default function Home() {
 
                 <StatsCard
                     title="Goal Progress"
-                    value="70%"
-                    progress={70}
+                    value={`${goalProgress}%`}
+                    progress={goalProgress}
                 />
 
                 <StatsCard

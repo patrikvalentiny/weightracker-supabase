@@ -6,10 +6,26 @@ import { CurrentWeightCard } from "../components/cards/CurrentWeightCard";
 import { WeeklyProgressCard } from "../components/cards/WeeklyProgressCard";
 import { WeightTrendCard } from "../components/cards/WeightTrendCard";
 import { StatsCard } from "../components/cards/StatsCard";
+import { useEffect, useState } from "react";
+import { getUserDetails } from "../services/userDetails";
+import { UserDetails } from "../types/userDetails";
 
 export default function Home() {
     const { weights, refreshWeights } = useWeights();
+    const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
     const latestWeight = weights[0];
+
+    useEffect(() => {
+        const loadUserDetails = async () => {
+            try {
+                const details = await getUserDetails();
+                setUserDetails(details);
+            } catch (error) {
+                console.error('Failed to load user details:', error);
+            }
+        };
+        loadUserDetails();
+    }, []);
 
     // Add null checks for BMI calculations
     const currentBMI = latestWeight?.bmi ?? 0;
@@ -46,15 +62,16 @@ export default function Home() {
         }
     };
 
-       // Calculate goal progress - if current weight is higher than target, show progress towards target
+    // Calculate goal progress - if current weight is higher than target, show progress towards target
+    const firstWeight = weights.at(-1)?.weight;
     const goalProgress = 
-    // details?.target_weight && latestWeight?.weight && weights.length > 0
-    //     ? Math.min(100, Math.max(0, Math.round(
-    //         ((latestWeight.weight - weights.at(-1)!.weight) / 
-    //         (details.target_weight - weights.at(-1)!.weight)) * 100
-    //     )))
-    //     : 
-        0;
+        userDetails?.target_weight && latestWeight?.weight && weights.length > 0
+            ? Math.min(100, Math.max(0, Math.round(
+                ((firstWeight! - latestWeight.weight) / 
+                (firstWeight! - userDetails.target_weight)) * 100
+            )))
+            : 0;
+
     const BMIInfo = (
         <div className="dropdown dropdown-hover dropdown-top">
             <label tabIndex={0} className="cursor-help">

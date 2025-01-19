@@ -22,7 +22,7 @@ export async function addWeight(weight: Weight): Promise<Weight | null> {
   
   const { data } = await supabase
     .from("weights")
-    .insert(weightWithUser)
+    .upsert(weightWithUser)
     .select()
     .single() as { data: Weight | null };
   

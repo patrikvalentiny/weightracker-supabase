@@ -8,4 +8,5 @@ export interface WeightWithBMIModel  {
   recommendations?: string;
   description?: string;
   difference?: number;
+  one_week_average?: number;
 }

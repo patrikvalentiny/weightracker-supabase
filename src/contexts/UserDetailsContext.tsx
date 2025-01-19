@@ -31,13 +31,9 @@ export function UserDetailsProvider({ children }: { children: ReactNode }) {
     };
 
     const updateDetails = async (newDetails: Partial<UserDetails>) => {
-        try {
-            const updatedDetails = await updateUserDetails(newDetails);
-            if (updatedDetails) {
-                setDetails(updatedDetails);
-            }
-        } catch (err) {
-            throw err;
+        const updatedDetails = await updateUserDetails(newDetails);
+        if (updatedDetails) {
+            setDetails(updatedDetails);
         }
     };
 

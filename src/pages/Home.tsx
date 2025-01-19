@@ -7,6 +7,7 @@ import { CurrentWeightCard } from "../components/cards/CurrentWeightCard";
 import { WeeklyProgressCard } from "../components/cards/WeeklyProgressCard";
 import { WeightTrendCard } from "../components/cards/WeightTrendCard";
 import { StatsCard } from "../components/cards/StatsCard";
+
 export default function Home() {
     const { weights, refreshWeights } = useWeights();
     const { details } = useUserDetails();
@@ -108,6 +109,8 @@ export default function Home() {
         </div>
     );
 
+
+
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-3xl font-bold mb-6">
@@ -125,7 +128,7 @@ export default function Home() {
                     progress={weeklyProgress}
                     hasLastWeekValue={!!lastWeekWeight}
                 />
-                <WeightTrendCard />
+                <WeightTrendCard weights={weights} />
 
                 <StatsCard
                     title="BMI"

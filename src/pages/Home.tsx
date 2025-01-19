@@ -21,7 +21,9 @@ export default function Home() {
                 const details = await getUserDetails();
                 setUserDetails(details);
             } catch (error) {
-                console.error('Failed to load user details:', error);
+                if (process.env.NODE_ENV === 'development') {
+                    console.error('Failed to load user details:', error);
+                }
             }
         };
         loadUserDetails();

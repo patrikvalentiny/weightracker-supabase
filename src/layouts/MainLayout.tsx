@@ -22,9 +22,11 @@ const RedirectToLogin = () => {
 };
 
 const RedirectToSignup = () => {
+  const [, setLocation] = useLocation();
+  
   useEffect(() => {
-    window.location.href = '/signup';
-  }, []);
+    setLocation('/signup');
+  }, [setLocation]);
   
   return null;
 };
@@ -60,7 +62,7 @@ export function MainLayout() {
 
   if (!user) {
     return (
-      <main className="p-4 flex flex-col items-center">
+      <main className="flex flex-col items-center">
         <Switch>
           <Route path="/login" component={Login} />
           <Route path="/signup" component={Signup} />

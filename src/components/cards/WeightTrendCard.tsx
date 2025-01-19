@@ -30,10 +30,10 @@ export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
         })).reverse();
 
         const bmiZones = [
-            { y1: 0, y2: 18.5, fill: "#90caf9", opacity: 0.2, label: "Underweight" },
+            { y1: 15, y2: 18.5, fill: "#90caf9", opacity: 0.2, label: "Underweight" },
             { y1: 18.5, y2: 24.9, fill: "#81c784", opacity: 0.2, label: "Normal" },
             { y1: 24.9, y2: 29.9, fill: "#fff176", opacity: 0.2, label: "Overweight" },
-            { y1: 29.9, y2: 50, fill: "#ef9a9a", opacity: 0.2, label: "Obese" }
+            { y1: 29.9, y2: 40, fill: "#ef9a9a", opacity: 0.2, label: "Obese" }
         ];
 
         return (

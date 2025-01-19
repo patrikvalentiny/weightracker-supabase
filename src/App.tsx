@@ -1,12 +1,15 @@
 import { MainLayout } from "./layouts/MainLayout";
+import { UserDetailsProvider } from './contexts/UserDetailsContext';
 
 function App() {
 
   return (
 
-    <div>
-      <MainLayout />
-    </div>
+    <UserDetailsProvider>
+      <div>
+        <MainLayout />
+      </div>
+    </UserDetailsProvider>
   );
 }
 

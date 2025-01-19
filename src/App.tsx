@@ -1,15 +1,14 @@
 import { MainLayout } from "./layouts/MainLayout";
-import { UserDetailsProvider } from './contexts/UserDetailsContext';
+import { AuthProvider } from "./contexts/AuthContext";
 
 function App() {
 
   return (
-
-    <UserDetailsProvider>
-      <div>
-        <MainLayout />
-      </div>
-    </UserDetailsProvider>
+    <AuthProvider>
+        <div>
+          <MainLayout />
+        </div>
+    </AuthProvider>
   );
 }
 

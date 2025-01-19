@@ -1,6 +1,5 @@
 import { WeightInput } from "../components/WeightInput";
 import { useWeights } from "../contexts/WeightsContext";
-import { useUserDetails } from "../contexts/UserDetailsContext";
 import { addWeight } from "../services/weights";
 import { Weight } from "../types/weight";
 import { CurrentWeightCard } from "../components/cards/CurrentWeightCard";
@@ -10,7 +9,6 @@ import { StatsCard } from "../components/cards/StatsCard";
 
 export default function Home() {
     const { weights, refreshWeights } = useWeights();
-    const { details } = useUserDetails();
     const latestWeight = weights[0];
 
     // Add null checks for BMI calculations
@@ -49,12 +47,14 @@ export default function Home() {
     };
 
        // Calculate goal progress - if current weight is higher than target, show progress towards target
-    const goalProgress = details?.target_weight && latestWeight?.weight && weights.length > 0
-        ? Math.min(100, Math.max(0, Math.round(
-            ((latestWeight.weight - weights.at(-1)!.weight) / 
-            (details.target_weight - weights.at(-1)!.weight)) * 100
-        )))
-        : 0;
+    const goalProgress = 
+    // details?.target_weight && latestWeight?.weight && weights.length > 0
+    //     ? Math.min(100, Math.max(0, Math.round(
+    //         ((latestWeight.weight - weights.at(-1)!.weight) / 
+    //         (details.target_weight - weights.at(-1)!.weight)) * 100
+    //     )))
+    //     : 
+        0;
     const BMIInfo = (
         <div className="dropdown dropdown-hover dropdown-top">
             <label tabIndex={0} className="cursor-help">
@@ -113,11 +113,11 @@ export default function Home() {
 
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-3xl font-bold mb-6">
+            {/* <h1 className="text-3xl font-bold mb-6">
                  {(details?.first_name || details?.last_name) && 
                     `Hi, ${details?.first_name || ''} ${details?.last_name || ''}`
                  }
-            </h1>
+            </h1> */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <CurrentWeightCard
                     weight={latestWeight?.weight ?? 0}

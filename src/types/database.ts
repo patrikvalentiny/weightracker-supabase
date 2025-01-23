@@ -67,19 +67,19 @@ export type Database = {
         Row: {
           created_on: string
           id: number
-          user_id: string | null
+          user_id: string
           weight: number
         }
         Insert: {
           created_on: string
           id?: number
-          user_id?: string | null
+          user_id: string
           weight: number
         }
         Update: {
           created_on?: string
           id?: number
-          user_id?: string | null
+          user_id?: string
           weight?: number
         }
         Relationships: []

@@ -1,12 +1,11 @@
 export interface WeightWithBMIModel  {
-  id: number;
-  weight: number;
-  created_on: string;
-  user_id: string;
-  bmi?: number;
-  bmi_category?: string;
-  recommendations?: string;
-  description?: string;
-  difference?: number;
-  one_week_average?: number;
+  id: number | null;
+  weight: number | null;
+  created_on: string | null;
+  user_id: string | null;
+  bmi: number | null;
+  bmi_category: string | null;
+  description: string | null;
+  difference: number | null;
+  one_week_average: number | null;
 }

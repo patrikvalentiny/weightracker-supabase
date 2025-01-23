@@ -7,7 +7,7 @@ export const WeeklyProgressCard = ({ progress, hasLastWeekValue }: WeeklyProgres
     return (
         <div className="card bg-base-200">
             <div className="card-body">
-                <h2 className="card-title">Weekly Progress</h2>
+                <h2 className="card-title">Weekly Average Progress</h2>
                 {hasLastWeekValue ? (
                     <>
                         <p className={`text-3xl font-bold ${progress <= 0 ? 'text-success' : 'text-error'}`}>

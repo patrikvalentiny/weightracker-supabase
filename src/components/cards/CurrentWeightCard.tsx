@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 interface CurrentWeightCardProps {
     weight?: number;
     date?: string;
@@ -5,6 +7,7 @@ interface CurrentWeightCardProps {
 }
 
 export const CurrentWeightCard = ({ weight, date, difference }: CurrentWeightCardProps) => {
+    const daysAgo = dayjs().diff(dayjs(date), 'day');
     return (
         <div className="card bg-base-200 md:col-span-2">
             <div className="card-body">
@@ -19,7 +22,9 @@ export const CurrentWeightCard = ({ weight, date, difference }: CurrentWeightCar
                                 </span>
                             )}
                         </p>
-                        <p className="text-sm opacity-80">Last updated: {date}</p>
+                        <p className="text-sm opacity-80">
+                            Last updated: {date} ({(daysAgo) === 0 ? 'Today' : `${daysAgo} days ago`})
+                        </p>
                     </>
                 ) : (
                     <p className="text-xl opacity-70">No weight data recorded yet</p>

@@ -1,17 +1,17 @@
 import { useState } from 'react';
+import { WeightWithBMIModel } from '../types/WeightWithBMI';
 
 interface WeightTableProps {
-  weights: Array<{
-    date: Date;
-    weight: number;
-    difference?: number;
-  }>;
+  weights: WeightWithBMIModel[];
   onWeightSelect?: (date: Date | null) => void;
 }
 
 export function WeightTable({ weights, onWeightSelect }: WeightTableProps) {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  
+  const transformedWeights = weights.map(weight => ({
+    ...weight,
+    created_on: new Date(weight.created_on!)
+  }));
   
   // Days array starting with Monday
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -53,25 +53,25 @@ export function WeightTable({ weights, onWeightSelect }: WeightTableProps) {
       </div>
       {/* Weights grid */}
       <div className="grid grid-cols-7 gap-1 mt-2">
-        {weights.length > 0 ? (
-          [...weights]
-            .sort((a, b) => a.date.getTime() - b.date.getTime())
+        {transformedWeights.length > 0 ? (
+          [...transformedWeights]
+            .sort((a, b) => a.created_on.getTime() - b.created_on.getTime())
             .map((weight) => (
               <div
-            key={weight.date.toISOString()}
-            onClick={() => handleWeightClick(weight.date)}
+            key={weight.created_on.toISOString()}
+            onClick={() => handleWeightClick(weight.created_on)}
             className={`
               card stat compact cursor-pointer hover:bg-base-200
-              ${weight.date === selectedDate ? 'bg-base-300' : 'bg-base-100'}
-              ${getColStart(weight.date)}
+              ${weight.created_on === selectedDate ? 'bg-base-300' : 'bg-base-100'}
+              ${getColStart(weight.created_on)}
             `}
               >
             <div className="card-body p-2 items-center text-center">
               <div className="text-xs opacity-50">
-                {weight.date.toLocaleDateString()}
+                {weight.created_on.toLocaleDateString()}
               </div>
               <div className="stat-value text-lg">
-                {weight.weight.toFixed(1)}
+                {weight.weight!.toFixed(1)}
               </div>
               <div className={`text-xs ${(weight.difference ?? 0) > 0 ? 'text-error' : 'text-success'}`}>
                 {(weight.difference ?? 0).toFixed(1)}kg

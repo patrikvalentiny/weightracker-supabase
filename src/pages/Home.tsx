@@ -34,14 +34,14 @@ export default function Home() {
     const bmiCategory = latestWeight?.bmi_category ?? 'Unknown';
 
     const lastWeekWeight = weights.find(w => {
-        const date = new Date(w.created_on);
+        const date = new Date(w.created_on!);
         const weekAgo = new Date();
         weekAgo.setDate(weekAgo.getDate() - 7);
         return date <= weekAgo;
     });
 
     const weeklyProgress = lastWeekWeight
-        ? Number((latestWeight?.weight - lastWeekWeight.weight).toFixed(1))
+        ? Number((latestWeight.one_week_average! - lastWeekWeight.one_week_average!).toFixed(1))
         : 0;
 
     const formatDate = (dateString: string) => {
@@ -140,8 +140,8 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <CurrentWeightCard
                     weight={latestWeight?.weight ?? 0}
-                    date={latestWeight ? formatDate(latestWeight.created_on) : 'No data'}
-                    difference={latestWeight?.difference}
+                    date={latestWeight ? formatDate(latestWeight.created_on!) : 'No data'}
+                    difference={latestWeight?.difference ?? 0}
                 />
                 <WeeklyProgressCard
                     progress={weeklyProgress}

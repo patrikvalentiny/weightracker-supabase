@@ -1,4 +1,4 @@
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, ReferenceArea } from "recharts";
+import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, ReferenceArea, TooltipProps } from "recharts";
 import { WeightWithBMIModel } from "../../types/WeightWithBMI";
 
 
@@ -22,19 +22,63 @@ export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
     }
 
     const WeightChart = () => {
+        const minBMI = Math.min(...weights.map(w => w.bmi!));
+        const maxBMI = Math.max(...weights.map(w => w.bmi!));
+        const minWeight = Math.min(...weights.map(w => w.weight!));
+        const maxWeight = Math.max(...weights.map(w => w.weight!));
+        
+        // Add padding to both ranges
+        const weightPadding = 0.5;
+        const bmiPadding = 0.5;
+        const yMinWeight = Math.floor(minWeight - weightPadding);
+        const yMaxWeight = Math.ceil(maxWeight + weightPadding);
+        const yMinBMI = Math.floor(minBMI - bmiPadding);
+        const yMaxBMI = Math.ceil(maxBMI + bmiPadding);
+
         const chartData = weights.map(w => ({
-            date: new Date(w.created_on).toLocaleDateString(),
+            date: new Date(w.created_on!).toLocaleDateString(),
             weight: w.weight,
-            bmi: w.bmi,
-            weekAvg: w.one_week_average
+            weekAvg: w.one_week_average,
+            bmi: w.bmi?.toFixed(1) ?? 0
         })).reverse();
 
         const bmiZones = [
-            { y1: 15, y2: 18.5, fill: "#90caf9", opacity: 0.2, label: "Underweight" },
-            { y1: 18.5, y2: 24.9, fill: "#81c784", opacity: 0.2, label: "Normal" },
-            { y1: 24.9, y2: 29.9, fill: "#fff176", opacity: 0.2, label: "Overweight" },
-            { y1: 29.9, y2: 40, fill: "#ef9a9a", opacity: 0.2, label: "Obese" }
-        ];
+            { bmi1: 0, bmi2: 18.5, fill: "#90caf9", opacity: 0.2, label: "Underweight" },
+            { bmi1: 18.5, bmi2: 24.9, fill: "#81c784", opacity: 0.2, label: "Normal" },
+            { bmi1: 24.9, bmi2: 29.9, fill: "#fff176", opacity: 0.2, label: "Overweight" },
+            { bmi1: 29.9, bmi2: 100, fill: "#ef9a9a", opacity: 0.2, label: "Obese" }
+        ]
+        .filter(zone => zone.bmi1 <= maxBMI && zone.bmi2 >= minBMI)
+        .map(zone => ({
+            ...zone,
+            bmi1: Math.max(zone.bmi1, yMinBMI),
+            bmi2: Math.min(zone.bmi2, yMaxBMI)
+        }));
+
+        const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
+            if (!active || !payload || !payload.length) {
+                return null;
+            }
+            const matchingData = chartData.find(data => data.date === label);
+            const customPayload = [
+                { name: 'Weight', value: matchingData?.weight?.toFixed(1) ?? 0, color: payload.at(0)?.color ?? '#8884d8' },
+                { name: 'Week Average', value: matchingData?.weekAvg?.toFixed(1), color: payload.at(1)?.color ?? '#82ca9d' },
+                { name: 'BMI', value: matchingData?.bmi, color: 'oklch(var(--a))' }
+            ].filter(item => item.value != null);
+
+            return (
+                <div className="bg-base-100 p-4 rounded-lg shadow-lg border border-base-300">
+                    <p className="font-semibold mb-2">{label}</p>
+                    {customPayload.map((entry, index) => (
+                                <div key={index} className="flex items-center gap-2">
+                                    <div className="w-3 h-3" style={{ backgroundColor: entry.color }}></div>
+                                    <span className="capitalize">{entry.name}:</span>
+                                    <span className="font-medium">{entry.value ?? 0}</span>
+                                </div>
+                            ))}
+                </div>
+            );
+        };
 
         return (
             <div className="card bg-base-200 p-4 col-span-full">
@@ -44,21 +88,30 @@ export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
                         <LineChart data={chartData}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="date" />
-                            <YAxis yAxisId="weight" domain={['auto', 'auto']} />
-                            <YAxis yAxisId="bmi" orientation="right" domain={[15, 40]} />
-                            <Tooltip />
+                            <YAxis 
+                                yAxisId="weight"
+                                domain={[yMinWeight, yMaxWeight]}
+                                label={{ value: 'Weight (kg)', angle: -90, position: 'insideLeft' }}
+                            />
+                            <YAxis 
+                                yAxisId="bmi"
+                                orientation="right"
+                                domain={[yMinBMI, yMaxBMI]}
+                                label={{ value: 'BMI', angle: 90, position: 'insideRight' }}
+                            />
+                            <Tooltip content={<CustomTooltip />} />
                             {bmiZones.map((zone, index) => (
                                 <ReferenceArea
                                     key={index}
                                     yAxisId="bmi"
-                                    y1={zone.y1}
-                                    y2={zone.y2}
+                                    y1={zone.bmi1}
+                                    y2={zone.bmi2}
                                     fill={zone.fill}
                                     fillOpacity={zone.opacity}
                                     label={{
                                         value: zone.label,
-                                        position: 'insideRight',
-                                        fill: '#666',
+                                        position: 'insideBottomRight',
+                                        fill: 'oklch(var(--bc))',
                                         fontSize: 10
                                     }}
                                 />
@@ -66,14 +119,14 @@ export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
                             <Line
                                 type="monotone"
                                 dataKey="weight"
-                                stroke="#8884d8"
+                                stroke="oklch(var(--p))"
                                 dot={false}
                                 yAxisId="weight"
                             />
                             <Line
                                 type="monotone"
                                 dataKey="weekAvg"
-                                stroke="#82ca9d"
+                                stroke="oklch(var(--s))"
                                 dot={false}
                                 strokeDasharray="5 5"
                                 yAxisId="weight"
@@ -81,7 +134,7 @@ export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
                             <Line
                                 type="monotone"
                                 dataKey="bmi"
-                                stroke="#ffc658"
+                                stroke="oklch(var(--a))"
                                 dot={false}
                                 yAxisId="bmi"
                             />

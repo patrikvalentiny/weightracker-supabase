@@ -41,7 +41,7 @@ export default function Home() {
     });
 
     const weeklyProgress = lastWeekWeight
-        ? Number((latestWeight.weight! - lastWeekWeight.weight!).toFixed(1))
+        ? Number((latestWeight.one_week_average! - lastWeekWeight.one_week_average!).toFixed(1))
         : 0;
 
     const formatDate = (dateString: string) => {

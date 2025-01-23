@@ -44,7 +44,7 @@ const RedirectToHome = () => {
 export function MainLayout() {
   const { user } = useAuth();
   const [weights, setWeights] = useState<WeightWithBMIModel[]>([]);
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
 
   const refreshWeights = useCallback(async () => {
     const data = await getWeights();
@@ -131,10 +131,31 @@ export function MainLayout() {
               </svg>
               <span className="text-lg font-semibold ml-2">Weight App</span>
             </div>
-            <ul className="menu text-base-content p-4">
-              <li><Link href="/">Home</Link></li>
-              <li><Link href="/weights">Weights</Link></li>
-              <li><Link href="/profile">Profile</Link></li>
+            <ul className="menu menu-bordered text-base-content p-4">
+              <li>
+                <Link 
+                  className={`${location === '/' ? 'active border-l-4 border-primary' : ''}`} 
+                  href="/"
+                >
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  className={`${location === '/weights' ? 'active border-l-4 border-primary' : ''}`} 
+                  href="/weights"
+                >
+                  Weights
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  className={`${location === '/profile' ? 'active border-l-4 border-primary' : ''}`} 
+                  href="/profile"
+                >
+                  Profile
+                </Link>
+              </li>
             </ul>
             <div className="mt-auto p-4">
               <button 

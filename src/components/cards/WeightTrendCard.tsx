@@ -48,7 +48,7 @@ export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
             { bmi1: 24.9, bmi2: 29.9, fill: "#fff176", opacity: 0.2, label: "Overweight" },
             { bmi1: 29.9, bmi2: 100, fill: "#ef9a9a", opacity: 0.2, label: "Obese" }
         ]
-        .filter(zone => zone.bmi1 <= maxBMI && zone.bmi2 >= minBMI)
+        .filter(zone => zone.bmi1 <= yMaxBMI && zone.bmi2 >= yMinBMI)
         .map(zone => ({
             ...zone,
             bmi1: Math.max(zone.bmi1, yMinBMI),

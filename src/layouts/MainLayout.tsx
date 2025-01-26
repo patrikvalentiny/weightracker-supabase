@@ -117,7 +117,7 @@ export function MainLayout() {
               </button>
             </div>
           </div>
-          <main className="p-4 flex flex-col items-center">
+          <main className="p-0.5 lg:p-4 flex flex-col items-center">
             <Switch>
               <Route path="/" component={Home} />
               <Route path="/weights" component={WeightList} />

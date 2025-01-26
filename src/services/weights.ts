@@ -53,3 +53,39 @@ export async function addWeight(weight: Weight): Promise<Weight | null> {
     return null;
   }
 }
+
+export async function updateWeight(id: number, weight: number): Promise<boolean> {
+  try {
+    const session = await getAuthSession();
+    if (!session) return false;
+
+    const { error } = await supabase
+      .from("weights")
+      .update({ weight })
+      .eq('id', id)
+      .eq('user_id', session.user.id);
+
+    return !error;
+  } catch (error) {
+    console.error('Error updating weight:', error);
+    return false;
+  }
+}
+
+export async function deleteWeight(id: number): Promise<boolean> {
+  try {
+    const session = await getAuthSession();
+    if (!session) return false;
+
+    const { error } = await supabase
+      .from("weights")
+      .delete()
+      .eq('id', id)
+      .eq('user_id', session.user.id);
+
+    return !error;
+  } catch (error) {
+    console.error('Error deleting weight:', error);
+    return false;
+  }
+}

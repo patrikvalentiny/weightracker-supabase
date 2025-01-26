@@ -1,19 +1,20 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
-import { signIn } from '../services/auth';
+import { resetPassword } from '../services/auth';
 
-export default function Login() {
+export default function ResetPassword() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [, setLocation] = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const { error } = await signIn(email, password);
+      const { error } = await resetPassword(email);
       if (error) throw error;
-      setLocation('/');
+      setMessage('Check your email for password reset instructions');
+      setTimeout(() => setLocation('/login'), 3000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
@@ -23,8 +24,8 @@ export default function Login() {
     <div className="hero h-dvh">
       <div className="hero-content flex-col">
         <div className="text-center">
-          <h1 className="text-5xl font-bold">Login</h1>
-          <p className="py-6">Welcome back! Please login to continue</p>
+          <h1 className="text-5xl font-bold">Reset Password</h1>
+          <p className="py-6">Enter your email to receive password reset instructions</p>
         </div>
         <div className="card w-full max-w-sm shadow-2xl bg-base-100">
           <form className="card-body" onSubmit={handleSubmit}>
@@ -40,36 +41,22 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">Password</span>
-              </label>
-              <input
-                type="password"
-                placeholder="password"
-                className="input input-bordered"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <label className="label">
-                <a href="/reset-password" className="label-text-alt link link-hover">
-                  Forgot Password?
-                </a>
-              </label>
-            </div>
+            {message && (
+              <div className="text-success text-sm mt-1">
+                {message}
+              </div>
+            )}
             {error && (
               <div className="text-error text-sm mt-1">
                 {error}
               </div>
             )}
             <div className="form-control mt-6">
-              <button className="btn btn-primary">Login</button>
+              <button className="btn btn-primary">Reset Password</button>
             </div>
-            <label className="label">
-                <a href="/signup" className="label-text-alt link link-hover">
-                  Don't have an account? Sign up
-                </a>
-              </label>
+            <div className="text-center mt-4">
+              <a href="/login" className="link link-hover">Back to Login</a>
+            </div>
           </form>
         </div>
       </div>

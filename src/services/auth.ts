@@ -21,6 +21,20 @@ export async function signOut(): Promise<void> {
   await supabase.auth.signOut();
 }
 
+export async function resetPassword(email: string): Promise<{ error: Error | null }> {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/update-password`,
+  });
+  return { error };
+}
+
+export async function updatePassword(password: string): Promise<{ error: Error | null }> {
+  const { error } = await supabase.auth.updateUser({
+    password: password,
+  });
+  return { error };
+}
+
 export const getAuthSession = async (retries = 3, delay = 500): Promise<Session | null> => {
   try {
     for (let i = 0; i < retries; i++) {

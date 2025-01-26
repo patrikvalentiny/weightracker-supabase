@@ -51,11 +51,7 @@ export default function Signup() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <label className="label">
-                <a href="/login" className="label-text-alt link link-hover">
-                  Already have an account? Login
-                </a>
-              </label>
+              
             </div>
             {error && (
               <div className="text-error text-sm mt-1">
@@ -65,6 +61,11 @@ export default function Signup() {
             <div className="form-control mt-6">
               <button className="btn btn-primary">Sign Up</button>
             </div>
+            <label className="label">
+                <a href="/login" className="label-text-alt link link-hover">
+                  Already have an account? Login
+                </a>
+              </label>
           </form>
         </div>
       </div>

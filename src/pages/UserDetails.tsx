@@ -99,6 +99,12 @@ export default function UserDetails() {
                   <div className="form-control mt-6">
                       <button className="btn btn-primary">Save Changes</button>
                   </div>
+                  <div className="divider">or</div>
+                  <div className="text-center">
+                      <a href="/update-password" className="link link-primary">
+                          Reset Password
+                      </a>
+                  </div>
               </form>
           </div>
       </div>

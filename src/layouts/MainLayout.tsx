@@ -10,6 +10,8 @@ import Login from "../pages/Login";
 import UserDetails from "../pages/UserDetails";
 import { signOut } from "../services/auth";
 import { useAuth } from "../contexts/AuthContext";
+import ResetPassword from "../pages/ResetPassword";
+import UpdatePassword from "../pages/UpdatePassword";
 
 const RedirectToLogin = () => {
   const [, setLocation] = useLocation();
@@ -66,6 +68,8 @@ export function MainLayout() {
         <Switch>
           <Route path="/login" component={Login} />
           <Route path="/signup" component={Signup} />
+          <Route path="/reset-password" component={ResetPassword} />
+          <Route path="/update-password" component={UpdatePassword} />
           <Route path="/register" component={RedirectToSignup} />
           <Route component={RedirectToLogin} />
         </Switch>
@@ -118,6 +122,7 @@ export function MainLayout() {
               <Route path="/" component={Home} />
               <Route path="/weights" component={WeightList} />
               <Route path="/profile" component={UserDetails} />
+              <Route path="/update-password" component={UpdatePassword} />
               <Route component={RedirectToHome} />
             </Switch>
           </main>

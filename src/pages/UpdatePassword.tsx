@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
+import {  useState } from 'react';
 import { useLocation } from 'wouter';
 import { updatePassword } from '../services/auth';
-import { supabase } from '../supabaseClient';
 
 export default function UpdatePassword() {
   const [password, setPassword] = useState('');
@@ -10,18 +9,6 @@ export default function UpdatePassword() {
   const [error, setError] = useState('');
   const [, setLocation] = useLocation();
 
-//   useEffect(() => {
-//     supabase.auth.onAuthStateChange(async (event, session) => {
-//       if (event == "PASSWORD_RECOVERY") {
-//         const newPassword = prompt("What would you like your new password to be?");
-//         const { data, error } = await supabase.auth
-//           .updateUser({ password: newPassword! })
- 
-//         if (data) alert("Password updated successfully!")
-//         if (error) alert("There was an error updating your password.")
-//       }
-//     })
-//   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -65,11 +65,12 @@ export default function Login() {
             <div className="form-control mt-6">
               <button className="btn btn-primary">Login</button>
             </div>
-            <label className="label">
-                <a href="/signup" className="label-text-alt link link-hover">
-                  Don't have an account? Sign up
-                </a>
-              </label>
+            <div className="divider">or</div>
+            <div className="text-center">
+              <a href="/signup" className="link link-primary">
+                Don't have an account? Sign up
+              </a>
+            </div>
           </form>
         </div>
       </div>

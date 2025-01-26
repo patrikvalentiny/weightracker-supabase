@@ -61,11 +61,12 @@ export default function Signup() {
             <div className="form-control mt-6">
               <button className="btn btn-primary">Sign Up</button>
             </div>
-            <label className="label">
-                <a href="/login" className="label-text-alt link link-hover">
-                  Already have an account? Login
-                </a>
-              </label>
+            <div className="divider">or</div>
+            <div className="text-center">
+              <a href="/login" className="link link-primary">
+                Already have an account? Login
+              </a>
+            </div>
           </form>
         </div>
       </div>

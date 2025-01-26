@@ -37,6 +37,7 @@ export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
 
         const chartData = weights.map(w => ({
             date: new Date(w.created_on!).toLocaleDateString(),
+            dateValue: new Date(w.created_on!).getTime(),
             weight: w.weight,
             weekAvg: w.one_week_average,
             bmi: w.bmi?.toFixed(1) ?? 0
@@ -59,7 +60,7 @@ export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
             if (!active || !payload || !payload.length) {
                 return null;
             }
-            const matchingData = chartData.find(data => data.date === label);
+            const matchingData = chartData.find(data => data.dateValue === label);
             const customPayload = [
                 { name: 'Weight', value: matchingData?.weight?.toFixed(1) ?? 0, color: payload.at(0)?.color ?? '#8884d8' },
                 { name: 'Week Average', value: matchingData?.weekAvg?.toFixed(1), color: payload.at(1)?.color ?? '#82ca9d' },
@@ -68,7 +69,7 @@ export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
 
             return (
                 <div className="bg-base-100 p-4 rounded-lg shadow-lg border border-base-300">
-                    <p className="font-semibold mb-2">{label}</p>
+                    <p className="font-semibold mb-2">{matchingData?.date}</p>
                     {customPayload.map((entry, index) => (
                                 <div key={index} className="flex items-center gap-2">
                                     <div className="w-3 h-3" style={{ backgroundColor: entry.color }}></div>
@@ -87,7 +88,13 @@ export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
                     <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={chartData}>
                             <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="date" />
+                            <XAxis 
+                                dataKey="dateValue"
+                                type="number"
+                                scale="time"
+                                domain={['auto','auto']}
+                                tickFormatter={(value) => new Date(value).toLocaleDateString()}
+                            />
                             <YAxis 
                                 yAxisId="weight"
                                 domain={[yMinWeight, yMaxWeight]}
@@ -122,6 +129,8 @@ export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
                                 stroke="oklch(var(--p))"
                                 dot={false}
                                 yAxisId="weight"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                             />
                             <Line
                                 type="monotone"
@@ -130,6 +139,8 @@ export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
                                 dot={false}
                                 strokeDasharray="5 5"
                                 yAxisId="weight"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                             />
                             <Line
                                 type="monotone"
@@ -137,6 +148,8 @@ export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
                                 stroke="oklch(var(--a))"
                                 dot={false}
                                 yAxisId="bmi"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                             />
                         </LineChart>
                     </ResponsiveContainer>

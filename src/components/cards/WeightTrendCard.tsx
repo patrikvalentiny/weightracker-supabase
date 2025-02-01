@@ -1,6 +1,6 @@
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, ReferenceArea, TooltipProps } from "recharts";
 import { WeightWithBMIModel } from "../../types/WeightWithBMI";
-import { useUserDetails } from "../../contexts/UserDetailsContext";
+import { useUserDetails } from "../../hooks/useUserDetails";
 
 interface WeightTrendCardProps {
     weights: WeightWithBMIModel[];

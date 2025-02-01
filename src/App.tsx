@@ -1,5 +1,5 @@
 import { MainLayout } from "./layouts/MainLayout";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider } from "./contexts/AuthProvider";
 import { UserDetailsProvider } from './contexts/UserDetailsContext';
 
 function App() {

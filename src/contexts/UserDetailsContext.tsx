@@ -1,15 +1,8 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 import { UserDetails } from '../types/userDetails';
 import { supabase } from '../supabaseClient';
 import { User } from '@supabase/supabase-js';
-
-interface UserDetailsContextType {
-  userDetails: UserDetails | null;
-  setUserDetails: (details: UserDetails | null) => void;
-  loading: boolean;
-}
-
-const UserDetailsContext = createContext<UserDetailsContextType | undefined>(undefined);
+import { UserDetailsContext } from './userDetailsContext';
 
 export const UserDetailsProvider = ({ children }: { children: ReactNode }) => {
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
@@ -57,12 +50,4 @@ export const UserDetailsProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </UserDetailsContext.Provider>
   );
-};
-
-export const useUserDetails = () => {
-  const context = useContext(UserDetailsContext);
-  if (context === undefined) {
-    throw new Error('useUserDetails must be used within a UserDetailsProvider');
-  }
-  return context;
 };

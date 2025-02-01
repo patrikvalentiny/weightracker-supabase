@@ -1,7 +1,15 @@
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, ReferenceArea, TooltipProps } from "recharts";
 import { WeightWithBMIModel } from "../../types/WeightWithBMI";
 import { useUserDetails } from "../../hooks/useUserDetails";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+
+const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+    });
+};
 
 interface DateRange {
     start: Date;
@@ -27,8 +35,10 @@ const DateRangeFilter = ({ onSelect, onClose }: { onSelect: (range: DateRange) =
     const handlePresetSelect = (days: number) => {
         const end = new Date();
         const start = days === 0 ? new Date(0) : new Date(end.getTime() - (days * 24 * 60 * 60 * 1000));
-        onSelect({ start, end });
-        onClose();
+        
+        // Format dates for input fields (YYYY-MM-DD)
+        setStartDate(start.toISOString().split('T')[0]);
+        setEndDate(end.toISOString().split('T')[0]);
     };
 
     const handleCustomRange = () => {
@@ -80,8 +90,47 @@ const DateRangeFilter = ({ onSelect, onClose }: { onSelect: (range: DateRange) =
     );
 };
 
+// Add localStorage utilities at the top with other utilities
+const STORAGE_KEY = 'weight-chart-filter';
+
+const loadSavedDateRange = (): DateRange | null => {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return null;
+        
+        const { start, end } = JSON.parse(saved);
+        return {
+            start: new Date(start),
+            end: new Date(end)
+        };
+    } catch (error) {
+        console.error('Failed to load saved date range:', error);
+        return null;
+    }
+};
+
+const saveDateRange = (range: DateRange) => {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            start: range.start.toISOString(),
+            end: range.end.toISOString()
+        }));
+    } catch (error) {
+        console.error('Failed to save date range:', error);
+    }
+};
+
 export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
-    const [dateRange, setDateRange] = useState<DateRange>({ start: new Date(0), end: new Date() });
+    const [dateRange, setDateRange] = useState<DateRange>(() => {
+        return loadSavedDateRange() || { start: new Date(0), end: new Date() };
+    });
+
+    // Save filter whenever it changes
+    useEffect(() => {
+        saveDateRange(dateRange);
+    }, [dateRange]);
+
+    const isFiltered = dateRange.start.getTime() !== new Date(0).getTime();
 
     if (!weights || weights.length === 0) {
         return (
@@ -121,7 +170,7 @@ export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
         const yMaxBMI = +(yMaxWeight / (heightInMeters * heightInMeters)).toFixed(1);
 
         const chartData = filteredWeights.map(w => ({
-            date: new Date(w.created_on!).toLocaleDateString(),
+            date: formatDate(new Date(w.created_on!)),
             dateValue: new Date(w.created_on!).getTime(),
             weight: w.weight,
             weekAvg: w.one_week_average,
@@ -169,26 +218,42 @@ export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
         return (
             <div className="card bg-base-200 p-4 col-span-full">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="card-title">Weight History</h2>
-                    <details className="dropdown dropdown-end">
-                        <summary className="btn btn-sm m-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
-                            </svg>
-                            Filter
-                        </summary>
-                        <DateRangeFilter
-                            onSelect={(range) => {
-                                setDateRange(range);
-                                const detailsElement = document.querySelector('details');
-                                if (detailsElement) detailsElement.removeAttribute('open');
-                            }}
-                            onClose={() => {
-                                const detailsElement = document.querySelector('details');
-                                if (detailsElement) detailsElement.removeAttribute('open');
-                            }}
-                        />
-                    </details>
+                    <div className="flex items-center gap-2">
+                        <h2 className="card-title">Weight History</h2>
+                        {isFiltered && (
+                            <span className="text-sm opacity-70 text-center h-full">
+                                {formatDate(dateRange.start)} - {formatDate(dateRange.end)}
+                            </span>
+                        )}
+                    </div>
+                    <div className="flex gap-2">
+                        {isFiltered && (
+                            <button 
+                                className="btn btn-sm btn-ghost"
+                                onClick={() => setDateRange({ start: new Date(0), end: new Date() })}
+                                title="Clear filter"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        )}
+                        <details className="dropdown dropdown-end">
+                            <summary className={`btn btn-sm ${isFiltered ? 'btn-accent' : ''}`}>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
+                                </svg>
+                                Filter
+                            </summary>
+                            <DateRangeFilter
+                                onSelect={setDateRange}
+                                onClose={() => {
+                                    const detailsElement = document.querySelector('details');
+                                    if (detailsElement) detailsElement.removeAttribute('open');
+                                }}
+                            />
+                        </details>
+                    </div>
                 </div>
                 <div className="w-full h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
@@ -199,7 +264,7 @@ export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
                                 type="number"
                                 scale="time"
                                 domain={['auto','auto']}
-                                tickFormatter={(value) => new Date(value).toLocaleDateString()}
+                                tickFormatter={(value) => formatDate(new Date(value))}
                             />
                             <YAxis 
                                 yAxisId="weight"

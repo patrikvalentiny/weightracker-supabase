@@ -1,12 +1,88 @@
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, ReferenceArea, TooltipProps } from "recharts";
 import { WeightWithBMIModel } from "../../types/WeightWithBMI";
 import { useUserDetails } from "../../hooks/useUserDetails";
+import { useState, useMemo } from "react";
+
+interface DateRange {
+    start: Date;
+    end: Date;
+}
 
 interface WeightTrendCardProps {
     weights: WeightWithBMIModel[];
 }
 
+const DateRangeFilter = ({ onSelect, onClose }: { onSelect: (range: DateRange) => void, onClose: () => void }) => {
+    const [startDate, setStartDate] = useState<string>("");
+    const [endDate, setEndDate] = useState<string>("");
+
+    const presetRanges = [
+        { label: "7 Days", days: 7 },
+        { label: "1 Month", days: 30 },
+        { label: "3 Months", days: 90 },
+        { label: "1 Year", days: 365 },
+        { label: "All", days: 0 }
+    ];
+
+    const handlePresetSelect = (days: number) => {
+        const end = new Date();
+        const start = days === 0 ? new Date(0) : new Date(end.getTime() - (days * 24 * 60 * 60 * 1000));
+        onSelect({ start, end });
+        onClose();
+    };
+
+    const handleCustomRange = () => {
+        if (startDate && endDate) {
+            onSelect({
+                start: new Date(startDate),
+                end: new Date(endDate)
+            });
+            onClose();
+        }
+    };
+
+    return (
+        <ul className="menu dropdown-content bg-base-100 rounded-box z-[1] w-64 p-4 shadow">
+            <div className="space-y-4">
+                <div className="space-y-2">
+                    {presetRanges.map(range => (
+                        <li key={range.label}>
+                            <a onClick={() => handlePresetSelect(range.days)}>
+                                {range.label}
+                            </a>
+                        </li>
+                    ))}
+                </div>
+                <div className="divider">Or select custom range</div>
+                <div className="space-y-2">
+                    <input
+                        type="date"
+                        className="input input-bordered input-sm w-full"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                    />
+                    <input
+                        type="date"
+                        className="input input-bordered input-sm w-full"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                    />
+                    <button
+                        className="btn btn-sm btn-primary w-full"
+                        onClick={handleCustomRange}
+                        disabled={!startDate || !endDate}
+                    >
+                        Apply Custom Range
+                    </button>
+                </div>
+            </div>
+        </ul>
+    );
+};
+
 export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
+    const [dateRange, setDateRange] = useState<DateRange>({ start: new Date(0), end: new Date() });
+
     if (!weights || weights.length === 0) {
         return (
             <div className="card bg-base-200 md:col-span-3 p-8">
@@ -25,8 +101,15 @@ export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
         const { userDetails } = useUserDetails();
         const heightInMeters = (userDetails?.height_cm ?? 170) / 100;
         
-        const minWeight = Math.min(...weights.map(w => w.weight!));
-        const maxWeight = Math.max(...weights.map(w => w.weight!));
+        const filteredWeights = useMemo(() => {
+            return weights.filter(w => {
+                const date = new Date(w.created_on!);
+                return date >= dateRange.start && date <= dateRange.end;
+            });
+        }, []);
+
+        const minWeight = Math.min(...filteredWeights.map(w => w.weight!));
+        const maxWeight = Math.max(...filteredWeights.map(w => w.weight!));
         
         // Add padding to weight range
         const weightPadding = 0.5;
@@ -37,7 +120,7 @@ export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
         const yMinBMI = +(yMinWeight / (heightInMeters * heightInMeters)).toFixed(1);
         const yMaxBMI = +(yMaxWeight / (heightInMeters * heightInMeters)).toFixed(1);
 
-        const chartData = weights.map(w => ({
+        const chartData = filteredWeights.map(w => ({
             date: new Date(w.created_on!).toLocaleDateString(),
             dateValue: new Date(w.created_on!).getTime(),
             weight: w.weight,
@@ -85,7 +168,28 @@ export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
 
         return (
             <div className="card bg-base-200 p-4 col-span-full">
-                <h2 className="card-title mb-4">Weight History</h2>
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="card-title">Weight History</h2>
+                    <details className="dropdown dropdown-end">
+                        <summary className="btn btn-sm m-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
+                            </svg>
+                            Filter
+                        </summary>
+                        <DateRangeFilter
+                            onSelect={(range) => {
+                                setDateRange(range);
+                                const detailsElement = document.querySelector('details');
+                                if (detailsElement) detailsElement.removeAttribute('open');
+                            }}
+                            onClose={() => {
+                                const detailsElement = document.querySelector('details');
+                                if (detailsElement) detailsElement.removeAttribute('open');
+                            }}
+                        />
+                    </details>
+                </div>
                 <div className="w-full h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={chartData}>

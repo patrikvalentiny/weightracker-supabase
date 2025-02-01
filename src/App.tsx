@@ -1,9 +1,8 @@
 import { MainLayout } from "./layouts/MainLayout";
 import { AuthProvider } from "./contexts/AuthProvider";
-import { UserDetailsProvider } from './contexts/UserDetailsContext';
+import { UserDetailsProvider } from './contexts/UserDetailsProvider';
 
 function App() {
-
   return (
     <AuthProvider>
       <UserDetailsProvider>

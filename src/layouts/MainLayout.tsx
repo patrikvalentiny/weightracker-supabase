@@ -9,7 +9,7 @@ import { WeightWithBMIModel } from "../types/WeightWithBMI";
 import Login from "../pages/Login";
 import UserDetails from "../pages/UserDetails";
 import { signOut } from "../services/auth";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../contexts/hooks/useAuth";
 import ResetPassword from "../pages/ResetPassword";
 import UpdatePassword from "../pages/UpdatePassword";
 

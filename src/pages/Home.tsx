@@ -6,28 +6,19 @@ import { CurrentWeightCard } from "../components/cards/CurrentWeightCard";
 import { WeeklyProgressCard } from "../components/cards/WeeklyProgressCard";
 import { WeightTrendCard } from "../components/cards/WeightTrendCard";
 import { StatsCard } from "../components/cards/StatsCard";
-import { useEffect, useState } from "react";
-import { getUserDetails } from "../services/userDetails";
-import { UserDetails } from "../types/userDetails";
+import { useUserDetails } from "../hooks/useUserDetails";
 
 export default function Home() {
     const { weights, refreshWeights } = useWeights();
-    const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
+    const { userDetails } = useUserDetails();
     const latestWeight = weights[0];
 
-    useEffect(() => {
-        const loadUserDetails = async () => {
-            try {
-                const details = await getUserDetails();
-                setUserDetails(details);
-            } catch (error) {
-                if (process.env.NODE_ENV === 'development') {
-                    console.error('Failed to load user details:', error);
-                }
-            }
-        };
-        loadUserDetails();
-    }, []);
+    const calculateWeightRange = (bmi1: number, bmi2: number, height: number) => {
+        const heightInMeters = height / 100;
+        const weight1 = +(bmi1 * heightInMeters * heightInMeters).toFixed(1);
+        const weight2 = +(bmi2 * heightInMeters * heightInMeters).toFixed(1);
+        return `${weight1} - ${weight2}`;
+    };
 
     // Add null checks for BMI calculations
     const currentBMI = latestWeight?.bmi ?? 0;
@@ -87,40 +78,49 @@ export default function Home() {
                         <tr>
                             <th>BMI Range</th>
                             <th>Category</th>
+                            {userDetails?.height_cm && <th>Weight Range (kg)</th>}
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td>&lt; 16.0</td>
                             <td>Severe Underweight</td>
+                            {userDetails?.height_cm && <td>&lt; {(16 * (userDetails.height_cm/100) * (userDetails.height_cm/100)).toFixed(1)}</td>}
                         </tr>
                         <tr>
                             <td>16.0 - 16.9</td>
                             <td>Moderate Underweight</td>
+                            {userDetails?.height_cm && <td>{calculateWeightRange(16, 16.99, userDetails.height_cm)}</td>}
                         </tr>
                         <tr>
                             <td>17.0 - 18.4</td>
                             <td>Mild Underweight</td>
+                            {userDetails?.height_cm && <td>{calculateWeightRange(17, 18.49, userDetails.height_cm)}</td>}
                         </tr>
                         <tr>
                             <td>18.5 - 24.9</td>
                             <td>Normal Weight</td>
+                            {userDetails?.height_cm && <td>{calculateWeightRange(18.5, 24.99, userDetails.height_cm)}</td>}
                         </tr>
                         <tr>
                             <td>25.0 - 29.9</td>
                             <td>Overweight</td>
+                            {userDetails?.height_cm && <td>{calculateWeightRange(25, 29.99, userDetails.height_cm)}</td>}
                         </tr>
                         <tr>
                             <td>30.0 - 34.9</td>
                             <td>Class I Obesity</td>
+                            {userDetails?.height_cm && <td>{calculateWeightRange(30, 34.99, userDetails.height_cm)}</td>}
                         </tr>
                         <tr>
                             <td>35.0 - 39.9</td>
                             <td>Class II Obesity</td>
+                            {userDetails?.height_cm && <td>{calculateWeightRange(35, 39.99, userDetails.height_cm)}</td>}
                         </tr>
                         <tr>
                             <td>≥ 40.0</td>
                             <td>Class III Obesity</td>
+                            {userDetails?.height_cm && <td>≥ {(40 * (userDetails.height_cm/100) * (userDetails.height_cm/100)).toFixed(1)}</td>}
                         </tr>
                     </tbody>
                 </table>
@@ -128,15 +128,8 @@ export default function Home() {
         </div>
     );
 
-
-
     return (
         <div className="container mx-auto p-4">
-            {/* <h1 className="text-3xl font-bold mb-6">
-                 {(details?.first_name || details?.last_name) && 
-                    `Hi, ${details?.first_name || ''} ${details?.last_name || ''}`
-                 }
-            </h1> */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <CurrentWeightCard
                     weight={latestWeight?.weight ?? 0}

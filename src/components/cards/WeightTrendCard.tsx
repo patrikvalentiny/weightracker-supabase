@@ -1,6 +1,6 @@
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, ReferenceArea, TooltipProps } from "recharts";
 import { WeightWithBMIModel } from "../../types/WeightWithBMI";
-
+import { useUserDetails } from "../../contexts/UserDetailsContext";
 
 interface WeightTrendCardProps {
     weights: WeightWithBMIModel[];
@@ -22,18 +22,20 @@ export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
     }
 
     const WeightChart = () => {
-        const minBMI = Math.min(...weights.map(w => w.bmi!));
-        const maxBMI = Math.max(...weights.map(w => w.bmi!));
+        const { userDetails } = useUserDetails();
+        const heightInMeters = (userDetails?.height_cm ?? 170) / 100;
+        
         const minWeight = Math.min(...weights.map(w => w.weight!));
         const maxWeight = Math.max(...weights.map(w => w.weight!));
         
-        // Add padding to both ranges
+        // Add padding to weight range
         const weightPadding = 0.5;
-        const bmiPadding = 0.5;
         const yMinWeight = Math.floor(minWeight - weightPadding);
         const yMaxWeight = Math.ceil(maxWeight + weightPadding);
-        const yMinBMI = Math.floor(minBMI - bmiPadding);
-        const yMaxBMI = Math.ceil(maxBMI + bmiPadding);
+
+        // Calculate BMI range from weight range using height
+        const yMinBMI = +(yMinWeight / (heightInMeters * heightInMeters)).toFixed(1);
+        const yMaxBMI = +(yMaxWeight / (heightInMeters * heightInMeters)).toFixed(1);
 
         const chartData = weights.map(w => ({
             date: new Date(w.created_on!).toLocaleDateString(),

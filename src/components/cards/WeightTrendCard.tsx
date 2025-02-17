@@ -14,7 +14,6 @@ interface WeightTrendCardProps {
 
 export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
     const [dateRange, setDateRange] = useState<DateRange>(() => loadSavedDateRange());
-    const [dateRange, setDateRange] = useState<DateRange>(() => loadSavedDateRange());
 
     useEffect(() => {
         saveDateRange(dateRange);

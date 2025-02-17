@@ -1,6 +1,6 @@
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, ReferenceArea, TooltipProps } from "recharts";
 import { WeightWithBMIModel } from "../../types/WeightWithBMI";
-import { useUserDetails } from "../../hooks/useUserDetails";
+import { useUserDetails } from "../../contexts/hooks/useUserDetails";
 import { useState, useMemo, useEffect } from "react";
 
 const formatDate = (date: Date) => {
@@ -20,6 +20,49 @@ interface WeightTrendCardProps {
     weights: WeightWithBMIModel[];
 }
 
+// Update storage type and utilities
+interface StoredFilter {
+    days: number;  // 0 means all time
+}
+
+const STORAGE_KEY = 'weight-chart-filter';
+
+const daysToDateRange = (days: number): DateRange => {
+    const end = new Date();
+    const start = days === 0 
+        ? new Date(0) 
+        : new Date(end.getTime() - (days * 24 * 60 * 60 * 1000));
+    return { start, end };
+};
+
+const dateRangeToDays = (range: DateRange): number => {
+    if (range.start.getTime() === new Date(0).getTime()) return 0;
+    const diffTime = range.end.getTime() - range.start.getTime();
+    return Math.round(diffTime / (1000 * 60 * 60 * 24));
+};
+
+const loadSavedDateRange = (): DateRange => {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return { start: new Date(0), end: new Date() };
+        
+        const { days } = JSON.parse(saved) as StoredFilter;
+        return daysToDateRange(days);
+    } catch (error) {
+        console.error('Failed to load saved filter:', error);
+        return { start: new Date(0), end: new Date() };
+    }
+};
+
+const saveDateRange = (range: DateRange) => {
+    try {
+        const days = dateRangeToDays(range);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ days }));
+    } catch (error) {
+        console.error('Failed to save filter:', error);
+    }
+};
+
 const DateRangeFilter = ({ onSelect, onClose }: { onSelect: (range: DateRange) => void, onClose: () => void }) => {
     const [startDate, setStartDate] = useState<string>("");
     const [endDate, setEndDate] = useState<string>("");
@@ -33,101 +76,102 @@ const DateRangeFilter = ({ onSelect, onClose }: { onSelect: (range: DateRange) =
     ];
 
     const handlePresetSelect = (days: number) => {
-        const end = new Date();
-        const start = days === 0 ? new Date(0) : new Date(end.getTime() - (days * 24 * 60 * 60 * 1000));
-        
-        // Format dates for input fields (YYYY-MM-DD)
-        setStartDate(start.toISOString().split('T')[0]);
-        setEndDate(end.toISOString().split('T')[0]);
+        const range = daysToDateRange(days);
+        onSelect(range);
+        onClose();
+    };
+
+    const handleSelect = (start: Date, end: Date) => {
+        onSelect({ start, end });
+        onClose();
     };
 
     const handleCustomRange = () => {
         if (startDate && endDate) {
-            onSelect({
-                start: new Date(startDate),
-                end: new Date(endDate)
-            });
-            onClose();
+            handleSelect(new Date(startDate), new Date(endDate));
         }
     };
 
     return (
-        <ul className="menu dropdown-content bg-base-100 rounded-box z-[1] w-64 p-4 shadow">
-            <div className="space-y-4">
-                <div className="space-y-2">
-                    {presetRanges.map(range => (
-                        <li key={range.label}>
-                            <a onClick={() => handlePresetSelect(range.days)}>
+        <dialog id="date_filter_modal" className="modal modal-bottom sm:modal-middle">
+            <div className="modal-box">
+                <h3 className="font-bold text-lg mb-4">Filter Date Range</h3>
+                <div className="space-y-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {presetRanges.map(range => (
+                            <button
+                                key={range.label}
+                                className="btn btn-sm btn-outline"
+                                onClick={() => handlePresetSelect(range.days)}
+                            >
                                 {range.label}
-                            </a>
-                        </li>
-                    ))}
+                            </button>
+                        ))}
+                    </div>
+                    <div className="divider">Or select custom range</div>
+                    <div className="space-y-2">
+                        <div className="form-control">
+                            <label className="label">
+                                <span className="label-text">Start Date</span>
+                            </label>
+                            <input
+                                type="date"
+                                className="input input-bordered w-full"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                            />
+                        </div>
+                        <div className="form-control">
+                            <label className="label">
+                                <span className="label-text">End Date</span>
+                            </label>
+                            <input
+                                type="date"
+                                className="input input-bordered w-full"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                            />
+                        </div>
+                        <button
+                            className="btn btn-primary w-full mt-4"
+                            onClick={handleCustomRange}
+                            disabled={!startDate || !endDate}
+                        >
+                            Apply Custom Range
+                        </button>
+                    </div>
                 </div>
-                <div className="divider">Or select custom range</div>
-                <div className="space-y-2">
-                    <input
-                        type="date"
-                        className="input input-bordered input-sm w-full"
-                        value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
-                    />
-                    <input
-                        type="date"
-                        className="input input-bordered input-sm w-full"
-                        value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
-                    />
-                    <button
-                        className="btn btn-sm btn-primary w-full"
-                        onClick={handleCustomRange}
-                        disabled={!startDate || !endDate}
-                    >
-                        Apply Custom Range
-                    </button>
+                <div className="modal-action">
+                    <form method="dialog">
+                        <button className="btn">Close</button>
+                    </form>
                 </div>
             </div>
-        </ul>
+            <form method="dialog" className="modal-backdrop">
+                <button>close</button>
+            </form>
+        </dialog>
     );
 };
 
-// Add localStorage utilities at the top with other utilities
-const STORAGE_KEY = 'weight-chart-filter';
-
-const loadSavedDateRange = (): DateRange | null => {
-    try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (!saved) return null;
-        
-        const { start, end } = JSON.parse(saved);
-        return {
-            start: new Date(start),
-            end: new Date(end)
-        };
-    } catch (error) {
-        console.error('Failed to load saved date range:', error);
-        return null;
-    }
-};
-
-const saveDateRange = (range: DateRange) => {
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({
-            start: range.start.toISOString(),
-            end: range.end.toISOString()
-        }));
-    } catch (error) {
-        console.error('Failed to save date range:', error);
-    }
-};
-
 export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
-    const [dateRange, setDateRange] = useState<DateRange>(() => {
-        return loadSavedDateRange() || { start: new Date(0), end: new Date() };
-    });
+    const [dateRange, setDateRange] = useState<DateRange>(() => loadSavedDateRange());
 
-    // Save filter whenever it changes
+    // Update effect to recalculate range on midnight
     useEffect(() => {
         saveDateRange(dateRange);
+
+        // Recalculate range at midnight
+        const now = new Date();
+        const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+        const timeUntilMidnight = tomorrow.getTime() - now.getTime();
+
+        const timer = setTimeout(() => {
+            const days = dateRangeToDays(dateRange);
+            setDateRange(daysToDateRange(days));
+        }, timeUntilMidnight);
+
+        return () => clearTimeout(timer);
     }, [dateRange]);
 
     const isFiltered = dateRange.start.getTime() !== new Date(0).getTime();
@@ -238,21 +282,21 @@ export const WeightTrendCard = ({ weights }: WeightTrendCardProps) => {
                                 </svg>
                             </button>
                         )}
-                        <details className="dropdown dropdown-end">
-                            <summary className={`btn btn-sm ${isFiltered ? 'btn-accent' : ''}`}>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
-                                </svg>
-                                Filter
-                            </summary>
-                            <DateRangeFilter
-                                onSelect={setDateRange}
-                                onClose={() => {
-                                    const detailsElement = document.querySelector('details');
-                                    if (detailsElement) detailsElement.removeAttribute('open');
-                                }}
-                            />
-                        </details>
+                        <button 
+                            className={`btn btn-sm ${isFiltered ? 'btn-accent' : ''}`}
+                            onClick={() => (document.getElementById('date_filter_modal') as HTMLDialogElement)?.showModal()}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
+                            </svg>
+                            <span className="hidden sm:inline ml-2">Filter</span>
+                        </button>
+                        <DateRangeFilter
+                            onSelect={setDateRange}
+                            onClose={() => {
+                                (document.getElementById('date_filter_modal') as HTMLDialogElement)?.close();
+                            }}
+                        />
                     </div>
                 </div>
                 <div className="w-full h-[300px]">

@@ -6,7 +6,7 @@ import { CurrentWeightCard } from "../components/cards/CurrentWeightCard";
 import { WeeklyProgressCard } from "../components/cards/WeeklyProgressCard";
 import { WeightTrendCard } from "../components/cards/WeightTrendCard";
 import { StatsCard } from "../components/cards/StatsCard";
-import { useUserDetails } from "../hooks/useUserDetails";
+import { useUserDetails } from "../contexts/hooks/useUserDetails";
 
 export default function Home() {
     const { weights, refreshWeights } = useWeights();

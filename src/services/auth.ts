@@ -31,7 +31,9 @@ export async function signOut(): Promise<void> {
 
 export async function resetPassword(email: string): Promise<{ error: Error | null }> {
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${window.location.origin}/update-password`,
+    redirectTo: import.meta.env.PROD
+      ? `${import.meta.env.VITE_PRODUCTION_URL}/update-password` 
+      : `${window.location.origin}/update-password`,
   });
   return { error };
 }
